@@ -1,18 +1,20 @@
 // Contact, Message,
 import fs from 'fs'
 import path from 'path'
-import {ScanStatus, WechatyBuilder, log } from 'wechaty'
+import { ScanStatus, WechatyBuilder, log } from 'wechaty'
 import qrcodeTerminal from 'qrcode-terminal'
 import { puppetConf, qrcodeUrl } from './config/config.js'
 import openApi from 'openai-self'
+const sourceDir = 'openai_source'
 const openai = new openApi({
   apikey: process.env.OPENAI_API_KEY || '', // openai的api_Key：必填，可前往openai官网申请，sk-**
-  // proxy: 'http://127.0.0.1:21882', // 代理服务器地址：非必填，科学上网时需要
+  proxy: 'http://127.0.0.1:21882', // 代理服务器地址：非必填，科学上网时需要
+  sourceDir: sourceDir, // 内容缓存地址：非必填，默认值为./openai_source
   organizationId: '' // 组织机构Id：非必填
 });
 console.log(openai)
 const contextTimeMap = {}
-const warnMessageMap ={}
+const warnMessageMap = {}
 let intervalFunc = null
 const clearTime = 13 //分钟, 不进行对话多少分钟后,清除聊天记录
 const msgTime = 3 // 分钟, 在清除聊天记录多少分钟前，进行微信通知
@@ -55,16 +57,22 @@ async function onMessage (msg) {
       console.log(`【${fromName}】\n${msg.text().toString()}`)
       // 3.5模型
       const params = {
-        max_tokens: 500,
+        max_tokens: 800,
         context: fromName
       }
       const repObj = await openai.createChatCompletions(msg.text().toString(), params)
+      // const repObj = await openai.generateImage(msg.text().toString(), {lacalSave: true})
+      // const fileBox = bot.FileBox.fromFile(repObj[0]) // 填写本地图片路径
+      // console.dir(epObj[0])
+      // await msg.say(fileBox)
       // 普通模型
       // const repObj = await openai.createNomalCompletions(msg.text().toString(), {max_tokens: 2000})
       repMsg = repObj && typeof repObj === 'object' && repObj.content ? repObj.content : repObj
     } else {
+      console.dir(msg)
       repMsg = '暂时只支持文本对话哟！！！'
     }
+
     console.log(`【${puppetConf.name}】\n${repMsg}`)
     await msg.say(`【${puppetConf.name}】\n${repMsg.toString()}`)
     contextTimeMap[fromName] = new Date().getTime()
@@ -82,7 +90,7 @@ async function intervalDelete() {
     for (let key in contextTimeMap) {
       if (contextTimeMap[key]) {
         if (now > contextTimeMap[key] && now - contextTimeMap[key] > clearTime * 60000) {
-          openai.deleteContext(key)
+          openai.clearContext(key)
           contextTimeMap[key] && delete contextTimeMap[key]
           warnMessageMap[key] && delete warnMessageMap[key]
         } else if (now > contextTimeMap[key] && now - contextTimeMap[key] > (clearTime - msgTime) * 60000) {
@@ -93,7 +101,7 @@ async function intervalDelete() {
               await contact.say(userMsg)
             }
             const selfMsg = `【${puppetConf.name}】\n与${key}的聊天记录即将删除`
-            console.log(bot.currentUser)
+            // console.log(bot.currentUser)
             await bot.currentUser.say(selfMsg)
             warnMessageMap[key] = true
           }
@@ -109,23 +117,29 @@ async function intervalDelete() {
 }
 
 function initContextTime() {
-  const files = fs.readdirSync(path.resolve('./source_context'))
-  const now = new Date().getTime()
-  files.forEach(key => {
-    const filePath = path.resolve(`./source_context/${key}`)
-    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-      contextTimeMap[key.slice(0, key.length - 5)] = now
-    }
-  })
+  const contextDir = path.resolve(`${sourceDir}/context`)
+  if (fs.existsSync(contextDir)) {
+    const files = fs.readdirSync(contextDir)
+    const now = new Date().getTime()
+    files.forEach(key => {
+      const filePath = path.resolve(`${sourceDir}/${key}`)
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        contextTimeMap[key.slice(0, key.length - 5)] = now
+      }
+    })
+  }
 }
 
 const bot = WechatyBuilder.build(puppetConf)
-
 bot.on('scan',    onScan)
 bot.on('login',   onLogin)
 bot.on('logout',  onLogout)
-bot.on('message', onMessage)
-
+bot.on('ready', () => {
+  console.log('ready-go!!!')
+  bot.on('message', onMessage)
+  bot.on('friendship',  (friendship) => console.log(friendship))
+  bot.on('room-invite', (invitation) => console.log(invitation))
+})
 bot.start()
   .then(() => log.info('StarterBot', 'Starter Bot Started.'))
   .catch(e => log.error('StarterBot', e))
