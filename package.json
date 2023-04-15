@@ -6,14 +6,16 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "cross-env NODE_OPTIONS=\"--no-warnings\" node index.js",
+    "start": "cross-env NODE_OPTIONS=\"--no-warnings\" node ./src/index.js",
     "start:padlocal": "cross-env WECHATY_LOG=verbose WECHATY_PUPPET=wechaty-puppet-padlocal npm start"
   },
   "dependencies": {
-    "openai-self": "^1.0.29",
+    "file-box": "^1.5.5",
+    "openai-self": "^1.1.1",
     "qrcode-terminal": "^0.12.0",
     "ts-node": "^10.9.1",
     "wechaty": "^1.20.2",
+    "wechaty-puppet": "^1.20.2",
     "wechaty-puppet-padlocal": "^1.20.1",
     "wechaty-puppet-wechat": "^1.18.4"
   },
