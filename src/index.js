@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 13:21:25
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-15 14:47:40
+ * @LastEditTime: 2023-04-15 22:12:25
  * @FilePath: \node-wechaty-self\src\index.js
  */
 
@@ -21,10 +21,10 @@ const bot = WechatyBuilder.build(config.puppet)
 bot.on('scan',    onScan)
 bot.on('login',   onLogin)
 bot.on('logout',  onLogout)
+bot.on('message', onMessage)
+bot.on('friendship',  onFriendship)
+bot.on('room-invite', onRoomInvite)
 bot.on('ready', () => {
-  bot.on('message', onMessage)
-  bot.on('friendship',  onFriendship)
-  bot.on('room-invite', onRoomInvite)
   console.log('ready-go!!!')
 })
 bot.start()

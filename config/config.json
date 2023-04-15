@@ -1,7 +1,7 @@
 
 {
   "openai": {
-    "apiKey": "",
+    "apiKey": "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",
     "proxy": "",
     "sourceDir": "openai_source",
     "organizationId": ""

@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-13 15:29:03
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-13 17:58:25
+ * @LastEditTime: 2023-04-15 21:41:25
  * @FilePath: \node-wechaty-self\src\common\enum.js
  */
 
@@ -33,6 +33,18 @@ const Message = {
     Quote: 14
   }
 }
+
+const botModelType = {
+  0: 'welcome',
+  1: 'daviceChat',
+  2: 'gptChat',
+  3: 'generateImage',
+  welcome: 0,
+  daviceChat: 1,
+  gptChat: 2,
+  generateImage: 3
+}
 export {
-  Message
+  Message,
+  botModelType
 }

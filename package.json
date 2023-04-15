@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "file-box": "^1.5.5",
+    "lodash": "^4.17.21",
     "openai-self": "^1.1.1",
     "qrcode-terminal": "^0.12.0",
     "ts-node": "^10.9.1",
