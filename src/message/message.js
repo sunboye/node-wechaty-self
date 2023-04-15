@@ -52,7 +52,7 @@ const chatCompletions = async (key, text) => {
   if (res.success) {
     return res.choices && res.choices.length && res.choices[0].message ? res.choices[0].message.content : ''
   } else {
-    return res.message ? res.message : res.param
+    return `Error: ${res.message}`
   }
 }
 
@@ -64,7 +64,7 @@ const nomalCompletions = async (text) => {
   if (res.success) {
     return res.choices && res.choices.length && res.choices[0] ? res.choices[0].text :''
   } else {
-    return res.message ? res.message : res.param
+    return  `Error: ${res.message}`
   }
 }
 
@@ -117,7 +117,7 @@ const onMessage = async (msg) => {
     } else {
       messageStr = 'Error: Failed to obtain key, please contact the administrator by phone'
     }
-    await msg.say(messageStr)
+    messageStr && await msg.say(messageStr)
   }
 }
 
