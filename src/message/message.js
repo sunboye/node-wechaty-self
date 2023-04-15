@@ -26,13 +26,13 @@ const userInfo = {}
 const setModel = (key, text) => {
   if (text === botModelType.daviceChat.toString()) {
     userInfo[key].cur_model = botModelType.daviceChat
-    return `【${config.puppet.name}】\n你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？`
+    return '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？'
   } else if (text === botModelType.gptChat.toString()) {
     userInfo[key].cur_model = botModelType.gptChat
-    return `【${config.puppet.name}】\n你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？`
+    return '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？'
   } else if (text === botModelType.generateImage.toString()) {
     userInfo[key].cur_model = botModelType.generateImage
-    return `【${config.puppet.name}】\n欢迎使用图片生成功能，请发送图片要求或者描述`
+    return '欢迎使用图片生成功能，请发送图片要求或者描述。'
   } else {
     return welcomeMsg()
   }
@@ -102,7 +102,7 @@ const onMessage = async (msg) => {
           }
         } else {
           if (userInfo[key].cur_model) {
-            messageStr = `【${config.puppet.name}】\n暂不支持该类型对话`
+            messageStr = '暂不支持该类型，请使用文本类型进行对话。'
           } else {
             messageStr = welcomeMsg()
           }
