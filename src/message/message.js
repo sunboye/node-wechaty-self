@@ -26,19 +26,19 @@ const userInfo = {}
 const setModel = (key, text) => {
   if (text === botModelType.daviceChat.toString()) {
     userInfo[key].cur_model = botModelType.daviceChat
-    return `【${config.puppet.name}】\n你好，请问你有什么需要帮助的吗？`
+    return `【${config.puppet.name}】\n你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？`
   } else if (text === botModelType.gptChat.toString()) {
     userInfo[key].cur_model = botModelType.gptChat
-    return `【${config.puppet.name}】\n你好，请问你有什么需要帮助的吗？`
+    return `【${config.puppet.name}】\n你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？`
   } else if (text === botModelType.generateImage.toString()) {
     userInfo[key].cur_model = botModelType.generateImage
-    return `【${config.puppet.name}】\n欢迎使用图片生成功能，请发送图片要求。`
+    return `【${config.puppet.name}】\n欢迎使用图片生成功能，请发送图片要求或者描述`
   } else {
     return welcomeMsg()
   }
 }
 const welcomeMsg = () => {
-  const welcomeStr = `欢迎使用松松的机器人\n回复功能简介前的数字，开启对应功能：\n\n${botModelType.daviceChat} - 普通聊天机器人\n${botModelType.gptChat} - 高级聊天机器人\n${botModelType.generateImage} - 生成图片\n\n回复*返回主菜单`
+  const welcomeStr = `欢迎使用松松的机器人\n\n回复功能简介前的数字，开启对应功能：\n\n${botModelType.daviceChat} - 普通聊天机器人\n${botModelType.gptChat} - 高级聊天机器人\n${botModelType.generateImage} - 生成图片\n\n回复*返回主菜单`
   return welcomeStr
 }
 
@@ -62,7 +62,7 @@ const nomalCompletions = async (text) => {
   }
   const res = await openai.createNomalCompletions(text, params)
   if (res.success) {
-    return res.choices && res.choices.length && res.choices[0] ? res.choices[0].text : res.toString()
+    return res.choices && res.choices.length && res.choices[0] ? res.choices[0].text :''
   } else {
     return res.message ? res.message : res.param
   }
@@ -77,8 +77,8 @@ const generateImage = async (text) => {
 
 const onMessage = async (msg) => {
   if (!msg.room() && !msg.self() && msg.age() < 180) {
-    console.log(msg.text())
     const key = msg.talker().id || msg.talker().name()
+    console.log(`[${key}]: ${msg.text()}`)
     let messageStr = ''
     if (key) {
       if (userInfo[key]) {
