@@ -44,12 +44,14 @@ const botModelType = {
   gptChat: 2,
   generateImage: 3
 }
+
 const modelWelcome = {
   0: '欢迎使用松松的机器人\n\n回复功能简介前的数字，开启对应功能：',
   1: '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？',
   2: '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？',
   3: '欢迎使用图片生成功能，请发送图片要求或者描述。'
 }
+
 export {
   Message,
   botModelType,

@@ -11,20 +11,20 @@ import lodash from 'lodash';
 import openApi from 'openai-self'
 import config from '../../config/config.js'
 import { botModelType, modelWelcome } from '../common/enum.js'
-
 const openai = new openApi(config.openai);
 const { cloneDeep } = lodash;
 const userTemp = {
-  unique_key: 'id',
+  unique_key: 'name',
   unique_val: '',
-  cur_model: 0,
+  cur_model: 0, // 标记用户当前所使用的功能
+  last_time: 0,
   warned: false,
   cleared: false
 }
 const userInfo = {}
 
 const setModel = (key, text) => {
-  const bottomTips = '【回复*可返回主菜单】'
+  const bottomTips = '提示：【回复*可返回主菜单】'
   if (text === botModelType.daviceChat.toString()) {
     userInfo[key].cur_model = botModelType.daviceChat
     return `${modelWelcome[botModelType.daviceChat]}\n\n${bottomTips}`
@@ -45,7 +45,7 @@ const welcomeMsg = () => {
       modelStr += `${item} - ${botModelType[item]}\n`
     }
   })
-  const welcomeStr = `${modelWelcome[botModelType.welcome]}\n\n${modelStr}`
+  const welcomeStr = `${modelWelcome[botModelType.welcome]}\n\n${modelStr}\n`
   return welcomeStr
 }
 
@@ -82,16 +82,51 @@ const generateImage = async (text) => {
   return fileBox
 }
 
+const intervalDelete = async () => {
+  if (Object.keys(userInfo).length) {
+    const now = new Date().getTime()
+    for (let key in userInfo) {
+      if (userInfo[key] && userInfo[key].cur_model && userInfo[key].last_time  && now > userInfo[key].last_time && now - userInfo[key].last_time > parseInt(config.bot.tipTime) * 60000) {
+        if (userInfo[key].cur_model === botModelType.gptChat) {
+          // 离开gpt聊天，清除聊天记录
+          openai.clearContext(key)
+        }
+        delete userInfo[key]
+        const contact = await bot.Contact.find({ name: key})
+        if (contact) {
+          const userMsg = `提示：您太久没说话，机器人已退回主菜单页面\n\n${welcomeMsg()}`
+          contact.say(userMsg)
+        }
+      }
+    }
+  }
+}
+let bot = {}
+const setBot = (val) => {
+  bot = val
+}
+
 const onMessage = async (msg) => {
   if (!msg.room() && !msg.self() && msg.age() < 180) {
-    const key = msg.talker().id || msg.talker().name()
+    //  msg.talker().id || 
+    // msg.talker().alise() || 
+    const key = msg.talker().name()
     console.log(`[${key}]: ${msg.text()}`)
     let messageStr = ''
     if (key) {
       if (userInfo[key]) {
+        userInfo[key].last_time = new Date().getTime()
+        userInfo[key].warned = false
+        if (!intervalFunc) {
+          intervalFunc = setInterval(intervalDelete, 60000)
+        }
         if (msg.type() === 7) {
           const text = msg.text().toString()
           if (text === '*') {
+            if (userInfo[key].cur_model === botModelType.gptChat) {
+              // 主动离开gpt聊天，清除聊天记录
+              openai.clearContext(key)
+            }
             userInfo[key].cur_model = botModelType.welcome
             messageStr = welcomeMsg()
           } else {
@@ -129,4 +164,7 @@ const onMessage = async (msg) => {
 }
 
 
-export default onMessage
+export {
+  setBot,
+  onMessage
+} 

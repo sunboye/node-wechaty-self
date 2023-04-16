@@ -13,7 +13,7 @@ import config from '../config/config.js'
 import onScan from './scan/scan.js'
 import onLogin from './login/login.js'
 import onLogout from './logout/logout.js'
-import onMessage from './message/message.js'
+import { onMessage, setBot } from './message/message.js'
 import onFriendship from './friend/friendship.js'
 import onRoomInvite from './room/invite.js'
 
@@ -28,5 +28,8 @@ bot.on('ready', () => {
   console.log('ready-go!!!')
 })
 bot.start()
-  .then(() => console.log(`Starter Bot Started.`))
+  .then(() => {
+    console.log(`Starter Bot Started.`)
+    setBot(bot)
+  })
   .catch(e => console.error(`StarterBot: ${e}`))
