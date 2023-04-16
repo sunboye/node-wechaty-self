@@ -35,16 +35,23 @@ const Message = {
 }
 
 const botModelType = {
-  0: 'welcome',
-  1: 'daviceChat',
-  2: 'gptChat',
-  3: 'generateImage',
+  0: '欢迎页',
+  1: '不怎么智能的聊天机器人',
+  2: '智能聊天机器人-gpt3.5',
+  3: '生成图片',
   welcome: 0,
   daviceChat: 1,
   gptChat: 2,
   generateImage: 3
 }
+const modelWelcome = {
+  0: '欢迎使用松松的机器人\n\n回复功能简介前的数字，开启对应功能：',
+  1: '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？',
+  2: '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？',
+  3: '欢迎使用图片生成功能，请发送图片要求或者描述。'
+}
 export {
   Message,
-  botModelType
+  botModelType,
+  modelWelcome
 }

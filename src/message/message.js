@@ -10,7 +10,7 @@ import { FileBox } from 'file-box'
 import lodash from 'lodash';
 import openApi from 'openai-self'
 import config from '../../config/config.js'
-import { botModelType } from '../common/enum.js'
+import { botModelType, modelWelcome } from '../common/enum.js'
 
 const openai = new openApi(config.openai);
 const { cloneDeep } = lodash;
@@ -24,21 +24,28 @@ const userTemp = {
 const userInfo = {}
 
 const setModel = (key, text) => {
+  const bottomTips = '【回复*可返回主菜单】'
   if (text === botModelType.daviceChat.toString()) {
     userInfo[key].cur_model = botModelType.daviceChat
-    return '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？'
+    return `${modelWelcome[botModelType.daviceChat]}\n\n${bottomTips}`
   } else if (text === botModelType.gptChat.toString()) {
     userInfo[key].cur_model = botModelType.gptChat
-    return '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？'
+    return `${modelWelcome[botModelType.gptChat]}\n\n${bottomTips}`
   } else if (text === botModelType.generateImage.toString()) {
     userInfo[key].cur_model = botModelType.generateImage
-    return '欢迎使用图片生成功能，请发送图片要求或者描述。'
+    return `${modelWelcome[botModelType.generateImage]}\n\n${bottomTips}`
   } else {
     return welcomeMsg()
   }
 }
 const welcomeMsg = () => {
-  const welcomeStr = `欢迎使用松松的机器人\n\n回复功能简介前的数字，开启对应功能：\n\n${botModelType.daviceChat} - 普通聊天机器人\n${botModelType.gptChat} - 高级聊天机器人\n${botModelType.generateImage} - 生成图片\n\n回复*返回主菜单`
+  let modelStr = ''
+  Object.keys(botModelType).forEach(item => {
+    if (item && !isNaN(item) && parseInt(item)) {
+      modelStr += `${item} - ${botModelType[item]}\n`
+    }
+  })
+  const welcomeStr = `${modelWelcome[botModelType.welcome]}\n\n${modelStr}`
   return welcomeStr
 }
 
