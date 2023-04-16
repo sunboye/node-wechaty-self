@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-16 01:10:12
+ * @LastEditTime: 2023-04-17 00:22:00
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -26,7 +26,7 @@ let bot = {}
 let intervalFunc = null
 
 const setModel = (key, text) => {
-  const bottomTips = '提示：【回复*可返回主菜单】'
+  const bottomTips = '提示：回复*可返回主菜单'
   if (text === botModelType.daviceChat.toString()) {
     userInfo[key].cur_model = botModelType.daviceChat
     return `${modelWelcome[botModelType.daviceChat]}\n\n${bottomTips}`
@@ -96,7 +96,7 @@ const intervalDelete = async () => {
         delete userInfo[key]
         const contact = await bot.Contact.find({ name: key})
         if (contact) {
-          const userMsg = `${welcomeMsg()}提示：【您太久没说话，已返回主菜单页面】`
+          const userMsg = `${welcomeMsg()}提示：您太久没说话，已返回主菜单页面`
           contact.say(userMsg)
         }
       }

@@ -1,8 +1,8 @@
 
 {
   "openai": {
-    "apiKey": "",
-    "proxy": "http://127.0.0.1:19180",
+    "apiKey": "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",
+    "proxy": "",
     "sourceDir": "openai_source",
     "organizationId": ""
   },
