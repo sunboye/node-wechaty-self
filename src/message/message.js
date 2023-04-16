@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 00:22:00
+ * @LastEditTime: 2023-04-17 00:24:42
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -88,7 +88,7 @@ const intervalDelete = async () => {
   if (Object.keys(userInfo).length) {
     const now = new Date().getTime()
     for (let key in userInfo) {
-      if (userInfo[key] && userInfo[key].cur_model && userInfo[key].last_time  && now > userInfo[key].last_time && now - userInfo[key].last_time > parseInt(config.bot.tipTime) * 60000) {
+      if (userInfo[key] && userInfo[key].cur_model && userInfo[key].last_time  && now > userInfo[key].last_time && now - userInfo[key].last_time > parseInt(config.bot.backHomeTime) * 60000) {
         if (userInfo[key].cur_model === botModelType.gptChat) {
           // 离开gpt聊天，清除聊天记录
           openai.clearContext(key)

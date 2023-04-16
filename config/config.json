@@ -1,7 +1,7 @@
 
 {
   "openai": {
-    "apiKey": "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",
+    "apiKey": "",
     "proxy": "",
     "sourceDir": "openai_source",
     "organizationId": ""
@@ -15,7 +15,7 @@
   },
   "bot": {
     "qrcodeUrl": "https://wechaty.js.org/qrcode/",
-    "clearContextTime": 13,
+    "backHomeTime": 10,
     "tipTime": 3
   }
 }
