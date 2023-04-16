@@ -36,8 +36,8 @@ const Message = {
 
 const botModelType = {
   0: '欢迎页',
-  1: '不怎么智能的聊天机器人',
-  2: '智能聊天机器人-gpt3.5',
+  1: '不太聪明的聊天机器人',
+  2: '智能聊天机器人',
   3: '生成图片',
   welcome: 0,
   daviceChat: 1,

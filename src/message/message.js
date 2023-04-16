@@ -22,6 +22,8 @@ const userTemp = {
   cleared: false
 }
 const userInfo = {}
+let bot = {}
+let intervalFunc = null
 
 const setModel = (key, text) => {
   const bottomTips = '提示：【回复*可返回主菜单】'
@@ -45,7 +47,7 @@ const welcomeMsg = () => {
       modelStr += `${item} - ${botModelType[item]}\n`
     }
   })
-  const welcomeStr = `${modelWelcome[botModelType.welcome]}\n\n${modelStr}\n`
+  const welcomeStr = `${modelWelcome[botModelType.welcome]}\n\n${modelStr}`
   return welcomeStr
 }
 
@@ -94,14 +96,14 @@ const intervalDelete = async () => {
         delete userInfo[key]
         const contact = await bot.Contact.find({ name: key})
         if (contact) {
-          const userMsg = `提示：您太久没说话，机器人已退回主菜单页面\n\n${welcomeMsg()}`
+          const userMsg = `${welcomeMsg()}提示：【您太久没说话，已返回主菜单页面】`
           contact.say(userMsg)
         }
       }
     }
   }
 }
-let bot = {}
+
 const setBot = (val) => {
   bot = val
 }
@@ -159,6 +161,7 @@ const onMessage = async (msg) => {
     } else {
       messageStr = 'Error: Failed to obtain key, please contact the administrator by phone'
     }
+    console.log(`[${config.puppet.name}]： ${messageStr}`)
     messageStr && await msg.say(messageStr)
   }
 }
