@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 00:29:16
+ * @LastEditTime: 2023-04-17 00:32:29
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -106,6 +106,7 @@ const intervalDelete = async () => {
 
 const setBot = (val) => {
   bot = val
+  openai.clearSourceDir()
 }
 
 const onMessage = async (msg) => {
@@ -152,9 +153,6 @@ const onMessage = async (msg) => {
           }
         }
       } else {
-        if (Object.keys(userInfo) < 1) {
-          openai.clearSourceDir()
-        }
         userInfo[key] = cloneDeep(userTemp)
         messageStr = welcomeMsg()
       }
