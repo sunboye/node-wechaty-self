@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 00:24:42
+ * @LastEditTime: 2023-04-17 00:29:16
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -96,7 +96,7 @@ const intervalDelete = async () => {
         delete userInfo[key]
         const contact = await bot.Contact.find({ name: key})
         if (contact) {
-          const userMsg = `${welcomeMsg()}提示：您太久没说话，已返回主菜单页面`
+          const userMsg = `${welcomeMsg()}\n提示：您太久没说话，已返回主菜单页面`
           contact.say(userMsg)
         }
       }
