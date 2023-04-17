@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 12:31:09
+ * @LastEditTime: 2023-04-17 13:15:42
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -25,6 +25,25 @@ const userInfo = {}
 let bot = {}
 let intervalFunc = null
 
+const leaveModel = (key) => {
+  if (userInfo[key].cur_model === botModelType.gptChat) {
+    openai.clearContext(key)
+  }
+  userInfo[key].cur_model = botModelType.welcome
+}
+
+const getCurModelSay = async (key, text) => {
+  if (userInfo[key].cur_model === botModelType.daviceChat) {
+    return await nomalCompletions(text)
+  } else if (userInfo[key].cur_model === botModelType.gptChat) {
+    return await chatCompletions(key, text)
+  } else if (userInfo[key].cur_model === botModelType.generateImage) {
+    return await generateImage(text)
+  } else {
+    return welcomeMsg()
+  }
+}
+
 const setModel = (key, text) => {
   const bottomTips = '提示：回复*可返回主菜单'
   if (text === botModelType.daviceChat.toString()) {
@@ -40,6 +59,7 @@ const setModel = (key, text) => {
     return welcomeMsg()
   }
 }
+
 const welcomeMsg = () => {
   let modelStr = ''
   Object.keys(botModelType).forEach(item => {
@@ -132,21 +152,11 @@ const onMessage = async (msg) => {
         if (msg.type() === 7) {
           const text = msg.text().toString()
           if (text === '*') {
-            if (userInfo[key].cur_model === botModelType.gptChat) {
-              // 主动离开gpt聊天，清除聊天记录
-              openai.clearContext(key)
-            }
-            userInfo[key].cur_model = botModelType.welcome
+            leaveModel(key)
             messageStr = welcomeMsg()
           } else {
             if (userInfo[key].cur_model) {
-              if (userInfo[key].cur_model === botModelType.daviceChat) {
-                messageStr = await nomalCompletions(text)
-              } else if (userInfo[key].cur_model === botModelType.gptChat) {
-                messageStr = await chatCompletions(key, text)
-              } else if (userInfo[key].cur_model === botModelType.generateImage) {
-                messageStr = await generateImage(text)
-              }
+              messageStr = await getCurModelSay(key, text)
             } else {
               messageStr = setModel(key, text)
             }
@@ -169,7 +179,6 @@ const onMessage = async (msg) => {
     messageStr && await msg.say(messageStr)
   }
 }
-
 
 export {
   setBot,
