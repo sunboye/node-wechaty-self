@@ -3,14 +3,15 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 14:13:08
+ * @LastEditTime: 2023-04-17 16:57:44
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
+import path from 'path';
 import lodash from 'lodash';
 import openApi from 'openai-self'
 import config from '../../config/config.js'
-import { botModelType, modelWelcome } from '../common/enum.js'
+import { Message, botModelType, modelWelcome } from '../common/enum.js'
 const openai = new openApi(config.openai);
 const { cloneDeep } = lodash;
 const userTemp = {
@@ -149,7 +150,7 @@ const onMessage = async (msg) => {
         if (!intervalFunc) {
           intervalFunc = setInterval(intervalDelete, 60000)
         }
-        if (msg.type() === 7) {
+        if (msg.type() === Message.MessageType.Text) {
           const text = msg.text().toString()
           if (text === '*') {
             leaveModel(key)
@@ -161,12 +162,17 @@ const onMessage = async (msg) => {
               messageStr = setModel(key, text)
             }
           }
-        } else {
+        } else if (msg.type() === Message.MessageType.Audio) {
           if (userInfo[key].cur_model) {
-            messageStr = '提示：暂不支持该类型，请使用文本类型进行对话。'
+            // const filebox = await msg.toFileBox()
+            // const savePath = path.resolve(`${config.openai.sourceDir}/${key}.mp3`)
+            // await filebox.toFile(savePath);
+            console.log(`Voice message saved to ${savePath}`);
           } else {
-            messageStr = welcomeMsg()
+            messageStr = userInfo[key].cur_model ? '提示：该功能不支持该类型，请使用语音类型进行对话。' : welcomeMsg()
           }
+        } else {
+          messageStr = userInfo[key].cur_model ? '提示：暂不支持该类型，请使用文本类型进行对话。' : welcomeMsg()
         }
       } else {
         userInfo[key] = cloneDeep(userTemp)
@@ -176,7 +182,13 @@ const onMessage = async (msg) => {
       messageStr = 'Error: Failed to obtain key, please contact the administrator by phone'
     }
     console.log(`[${config.puppet.name}]： ${messageStr}`)
-    messageStr && await msg.say(messageStr)
+    if (messageStr) {
+      try {
+        await msg.say(messageStr)
+      } catch (error) {
+        await msg.say(`Error: ${error.message}`)
+      }
+    }
   }
 }
 

@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-13 15:29:03
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-15 21:41:25
+ * @LastEditTime: 2023-04-17 17:56:39
  * @FilePath: \node-wechaty-self\src\common\enum.js
  */
 
@@ -18,8 +18,8 @@ const Message = {
   },
   MessageType: {
     Unknown: 1,
-    Attachment: 2,
-    Audio: 3,
+    Audio: 2,
+    Attachment: 3,
     Contact: 4,
     Emoticon: 5,
     Image: 6,
