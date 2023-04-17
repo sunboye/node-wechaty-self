@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 13:15:42
+ * @LastEditTime: 2023-04-17 14:13:08
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -163,7 +163,7 @@ const onMessage = async (msg) => {
           }
         } else {
           if (userInfo[key].cur_model) {
-            messageStr = '暂不支持该类型，请使用文本类型进行对话。'
+            messageStr = '提示：暂不支持该类型，请使用文本类型进行对话。'
           } else {
             messageStr = welcomeMsg()
           }
