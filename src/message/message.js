@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 10:17:40
+ * @LastEditTime: 2023-04-17 12:31:09
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -100,7 +100,7 @@ const intervalDelete = async () => {
         } else {
           const contact = await bot.Contact.find({ name: key})
           if (contact) {
-            const userMsg = `提示：您已经${config.bot.warnTime}分钟没说话了，如果需要继续当前功能（${botModelType[userInfo[key].cur_model]}），请回复任意内容，否则${config.puppet.name}将在${config.bot.clearTime}后离开，离开之后您可回复任意内容唤醒${config.puppet.name}。`
+            const userMsg = `提示：您已经${config.bot.warnTime}分钟没说话了，如果需要继续当前功能（${botModelType[userInfo[key].cur_model]}），请回复任意内容，否则${config.puppet.name}将在${config.bot.clearTime}分钟后离开，离开之后您可回复任意内容唤醒${config.puppet.name}。`
             contact.say(userMsg)
           }
           userInfo[key].warned = true
