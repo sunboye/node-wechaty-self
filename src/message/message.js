@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-17 00:32:29
+ * @LastEditTime: 2023-04-17 10:17:40
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -88,16 +88,22 @@ const intervalDelete = async () => {
   if (Object.keys(userInfo).length) {
     const now = new Date().getTime()
     for (let key in userInfo) {
-      if (userInfo[key] && userInfo[key].cur_model && userInfo[key].last_time  && now > userInfo[key].last_time && now - userInfo[key].last_time > parseInt(config.bot.backHomeTime) * 60000) {
-        if (userInfo[key].cur_model === botModelType.gptChat) {
-          // 离开gpt聊天，清除聊天记录
-          openai.clearContext(key)
-        }
-        delete userInfo[key]
-        const contact = await bot.Contact.find({ name: key})
-        if (contact) {
-          const userMsg = `${welcomeMsg()}\n提示：您太久没说话，已返回主菜单页面`
-          contact.say(userMsg)
+      if (userInfo[key] && userInfo[key].cur_model && userInfo[key].last_time  && now > userInfo[key].last_time && now - userInfo[key].last_time > parseInt(config.bot.warnTime) * 60000) {
+        if (userInfo[key].warned) {
+          if (now - userInfo[key].last_time > (parseInt(config.bot.warnTime) + parseInt(config.bot.clearTime)) * 60000) {
+            if (userInfo[key].cur_model === botModelType.gptChat) {
+              // 离开gpt聊天，清除聊天记录
+              openai.clearContext(key)
+            }
+            delete userInfo[key]
+          }
+        } else {
+          const contact = await bot.Contact.find({ name: key})
+          if (contact) {
+            const userMsg = `提示：您已经${config.bot.warnTime}分钟没说话了，如果需要继续当前功能（${botModelType[userInfo[key].cur_model]}），请回复任意内容，否则${config.puppet.name}将在${config.bot.clearTime}后离开，离开之后您可回复任意内容唤醒${config.puppet.name}。`
+            contact.say(userMsg)
+          }
+          userInfo[key].warned = true
         }
       }
     }

@@ -15,7 +15,7 @@
   },
   "bot": {
     "qrcodeUrl": "https://wechaty.js.org/qrcode/",
-    "backHomeTime": 10,
-    "tipTime": 3
+    "warnTime": 10,
+    "clearTime": 3
   }
 }
