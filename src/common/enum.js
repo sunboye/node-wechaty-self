@@ -39,21 +39,29 @@ const botModelType = {
   1: '不太聪明的聊天机器人',
   2: '智能聊天机器人',
   3: '生成图片',
+  4: '语音聊天',
   welcome: 0,
   daviceChat: 1,
   gptChat: 2,
-  generateImage: 3
+  generateImage: 3,
+  transcription: 4
 }
 
 const modelWelcome = {
   0: '欢迎使用松松的机器人\n\n回复功能简介前的数字，开启对应功能：',
   1: '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？',
   2: '你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？',
-  3: '欢迎使用图片生成功能，请发送图片要求或者描述。'
+  3: '欢迎使用图片生成功能，请发送图片要求或者描述。',
+  4: '你好，你现在可以使用语音聊天，请问你有什么需要帮助的吗？'
 }
 
+const typeWarnMsg = {
+  Audio: '提示：该功能不支持该类型，请使用语音类型进行对话。',
+  Text: '提示：该功能不支持该类型，请使用文本类型进行对话。'
+}
 export {
   Message,
   botModelType,
-  modelWelcome
+  modelWelcome,
+  typeWarnMsg
 }

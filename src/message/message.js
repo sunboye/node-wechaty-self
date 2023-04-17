@@ -11,7 +11,7 @@ import path from 'path';
 import lodash from 'lodash';
 import openApi from 'openai-self'
 import config from '../../config/config.js'
-import { Message, botModelType, modelWelcome } from '../common/enum.js'
+import { Message, botModelType, modelWelcome, typeWarnMsg } from '../common/enum.js'
 const openai = new openApi(config.openai);
 const { cloneDeep } = lodash;
 const userTemp = {
@@ -27,19 +27,30 @@ let bot = {}
 let intervalFunc = null
 
 const leaveModel = (key) => {
-  if (userInfo[key].cur_model === botModelType.gptChat) {
+  if (userInfo[key].cur_model === botModelType.gptChat || userInfo[key].cur_model === botModelType.transcription) {
     openai.clearContext(key)
   }
   userInfo[key].cur_model = botModelType.welcome
 }
 
-const getCurModelSay = async (key, text) => {
+const getCurModelText = async (key, text) => {
   if (userInfo[key].cur_model === botModelType.daviceChat) {
     return await nomalCompletions(text)
   } else if (userInfo[key].cur_model === botModelType.gptChat) {
     return await chatCompletions(key, text)
   } else if (userInfo[key].cur_model === botModelType.generateImage) {
     return await generateImage(text)
+  } else if (userInfo[key].cur_model === botModelType.transcription) {
+    return typeWarnMsg.Audio
+  } else {
+    return welcomeMsg()
+  }
+}
+const getCurModelAudio = async (key, file) => {
+  if (userInfo[key].cur_model === botModelType.daviceChat || userInfo[key].cur_model === botModelType.gptChat || userInfo[key].cur_model === botModelType.generateImage) {
+    return typeWarnMsg.Text
+  } else if (userInfo[key].cur_model === botModelType.transcription) {
+    return await createTranscription(key, file)
   } else {
     return welcomeMsg()
   }
@@ -56,6 +67,9 @@ const setModel = (key, text) => {
   } else if (text === botModelType.generateImage.toString()) {
     userInfo[key].cur_model = botModelType.generateImage
     return `${modelWelcome[botModelType.generateImage]}\n\n${bottomTips}`
+  } else if (text === botModelType.transcription.toString()) {
+    userInfo[key].cur_model = botModelType.transcription
+    return `${modelWelcome[botModelType.transcription]}\n\n${bottomTips}`
   } else {
     return welcomeMsg()
   }
@@ -71,7 +85,15 @@ const welcomeMsg = () => {
   const welcomeStr = `${modelWelcome[botModelType.welcome]}\n\n${modelStr}`
   return welcomeStr
 }
-
+const createTranscription = async (key, stream) => {
+  const res = await openai.createTranscription(stream)
+  if (res.success) {
+    const text = res.text  || ''
+    return await chatCompletions(key, text)
+  } else {
+    return `Error: ${res.message}`
+  }
+}
 const chatCompletions = async (key, text) => {
   // 3.5模型
   const params = {
@@ -141,7 +163,6 @@ const onMessage = async (msg) => {
     //  msg.talker().id || 
     // msg.talker().alise() || 
     const key = msg.talker().name()
-    console.log(`[${key}]: ${msg.text()}`)
     let messageStr = ''
     if (key) {
       if (userInfo[key]) {
@@ -152,27 +173,33 @@ const onMessage = async (msg) => {
         }
         if (msg.type() === Message.MessageType.Text) {
           const text = msg.text().toString()
+          console.log(`[${key}]: ${msg.text()}`)
           if (text === '*') {
             leaveModel(key)
             messageStr = welcomeMsg()
           } else {
             if (userInfo[key].cur_model) {
-              messageStr = await getCurModelSay(key, text)
+              messageStr = await getCurModelText(key, text)
             } else {
               messageStr = setModel(key, text)
             }
           }
         } else if (msg.type() === Message.MessageType.Audio) {
-          if (userInfo[key].cur_model) {
-            // const filebox = await msg.toFileBox()
-            // const savePath = path.resolve(openai.getSourceDir(), `${key}.mp3`)
-            // await filebox.toFile(savePath);
-            console.log(`Voice message saved to ${savePath}`);
+          console.log(`[${key}]: [语音]`)
+          if (userInfo[key].cur_model === botModelType.transcription) {
+            if (openai.createInSourceDir('audio')) {
+              const filebox = await msg.toFileBox()
+              const savePath = path.resolve(openai.getSourceDir(), 'audio', `${key}-${new Date().getTime()}.mp3`)
+              await filebox.toFile(savePath, true);
+              messageStr = await getCurModelAudio(key, savePath)
+            } else {
+              messageStr = '创建audio文件失败'
+            }
           } else {
-            messageStr = userInfo[key].cur_model ? '提示：该功能不支持该类型，请使用语音类型进行对话。' : welcomeMsg()
+            messageStr = userInfo[key].cur_model ? typeWarnMsg.Text : welcomeMsg()
           }
         } else {
-          messageStr = userInfo[key].cur_model ? '提示：暂不支持该类型，请使用文本类型进行对话。' : welcomeMsg()
+          messageStr = userInfo[key].cur_model ? typeWarnMsg.Text : welcomeMsg()
         }
       } else {
         userInfo[key] = cloneDeep(userTemp)
@@ -181,7 +208,7 @@ const onMessage = async (msg) => {
     } else {
       messageStr = 'Error: Failed to obtain key, please contact the administrator by phone'
     }
-    console.log(`[${config.puppet.name}]： ${messageStr}`)
+    console.log(`[${config.puppet.name}]：${messageStr}`)
     if (messageStr) {
       try {
         await msg.say(messageStr)
