@@ -3,7 +3,7 @@
   "openai": {
     "apiKey": "",
     "proxy": "",
-    "sourceDir": "openai_cache",
+    "sourceDir": "",
     "organizationId": ""
   },
   "puppet": {

@@ -165,7 +165,7 @@ const onMessage = async (msg) => {
         } else if (msg.type() === Message.MessageType.Audio) {
           if (userInfo[key].cur_model) {
             // const filebox = await msg.toFileBox()
-            // const savePath = path.resolve(`${config.openai.sourceDir}/${key}.mp3`)
+            // const savePath = path.resolve(openai.getSourceDir(), `${key}.mp3`)
             // await filebox.toFile(savePath);
             console.log(`Voice message saved to ${savePath}`);
           } else {
