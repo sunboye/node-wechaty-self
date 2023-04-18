@@ -53,6 +53,5 @@ Object.keys(childModel).forEach(item => {
 
 export {
   Message,
-  childModel,
-  typeWarnMsg
+  childModel
 }

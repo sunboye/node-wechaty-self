@@ -15,9 +15,9 @@
   "model-gptChat": {
     "open": true,
     "support": ["Text", "Audio"],
-    "title": "智能聊天机器人-支持语音和文字",
+    "title": "智能聊天机器人-支持语音和文字输入",
     "desc": "智能聊天机器人-支持语音和文字-基于chatgpt3.5",
-    "tip": "你好，你现在可以开始和我聊天，请问你有什么需要帮助的吗？"
+    "tip": "你好，你现在可以通过发送语音或者文字和我聊天，请问你有什么需要帮助的吗？"
   },
   "model-generateImage": {
     "open": true,
