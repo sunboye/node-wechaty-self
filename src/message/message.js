@@ -93,8 +93,8 @@ const welcomeMsg = () => {
   const welcomeStr = `${childModel['model-welcome'].tip}\n\n${modelStr}`
   return welcomeStr
 }
-const createTranscription = async (stream) => {
-  const res = await openai.createTranscription(stream)
+const createTranscription = async (file) => {
+  const res = await openai.createTranscription(file)
   if (res.success) {
     const text = res.text  || ''
     return text
@@ -102,8 +102,8 @@ const createTranscription = async (stream) => {
     return `Error: ${res.message}`
   }
 }
-const createAudioChat = async (key, stream) => {
-  const res = await openai.createTranscription(stream)
+const createAudioChat = async (key, file) => {
+  const res = await openai.createTranscription(file)
   if (res.success) {
     const text = res.text  || ''
     return await chatCompletions(key, text)
