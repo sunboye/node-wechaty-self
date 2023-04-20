@@ -3,11 +3,11 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-18 17:43:44
+ * @LastEditTime: 2023-04-20 21:19:16
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
-import path from 'path';
+// import path from 'path';
 import lodash from 'lodash';
 import openApi from 'openai-self'
 import config from '../../config/config.js'
@@ -201,18 +201,22 @@ const onMessage = async (msg) => {
         } else if (msg.type() === Message.MessageType.Audio) {
           console.log(`[${key}]: [语音]`)
           if (userInfo[key].cur_model) {
-            // 不保存，直接传stream
-            const filebox = await msg.toFileBox()
-            // const stream = await filebox.toStream()
-            // console.log(stream)
-            // messageStr = await getCurModelAudio(key, stream)
-            // 保存音频资源到本地
-            if (openai.createInSourceDir('audio')) {
-              const savePath = path.resolve(openai.getSourceDir(), 'audio', `${key}-${new Date().getTime()}.mp3`)
-              await filebox.toFile(savePath, true);
-              messageStr = await getCurModelAudio(key, savePath)
-            } else {
-              messageStr = '创建audio文件失败'
+            try {
+              // 不保存，直接传stream
+              const filebox = await msg.toFileBox()
+              const stream = await filebox.toStream()
+              messageStr = await getCurModelAudio(key, stream)
+              // 保存音频资源到本地
+              // if (openai.createInSourceDir('audio')) {
+              //   const savePath = path.resolve(openai.getSourceDir(), 'audio', `${key}-${new Date().getTime()}.mp3`)
+              //   await filebox.toFile(savePath, true);
+              //   messageStr = await getCurModelAudio(key, savePath)
+              // } else {
+              //   messageStr = '创建audio文件失败'
+              // }
+            } catch (error) {
+              messageStr = error.toString()
+              console.error(error)
             }
           } else {
             messageStr = getWarnMsg(key)
