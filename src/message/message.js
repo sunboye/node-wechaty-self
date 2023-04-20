@@ -7,7 +7,7 @@
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
-// import path from 'path';
+import path from 'path';
 import lodash from 'lodash';
 import openApi from 'openai-self'
 import config from '../../config/config.js'
@@ -204,16 +204,16 @@ const onMessage = async (msg) => {
             try {
               // 不保存，直接传stream
               const filebox = await msg.toFileBox()
-              const stream = await filebox.toStream()
-              messageStr = await getCurModelAudio(key, stream)
+              // const stream = await filebox.toStream()
+              // messageStr = await getCurModelAudio(key, stream)
               // 保存音频资源到本地
-              // if (openai.createInSourceDir('audio')) {
-              //   const savePath = path.resolve(openai.getSourceDir(), 'audio', `${key}-${new Date().getTime()}.mp3`)
-              //   await filebox.toFile(savePath, true);
-              //   messageStr = await getCurModelAudio(key, savePath)
-              // } else {
-              //   messageStr = '创建audio文件失败'
-              // }
+              if (openai.createInSourceDir('audio')) {
+                const savePath = path.resolve(openai.getSourceDir(), 'audio', `${key}-${new Date().getTime()}.mp3`)
+                await filebox.toFile(savePath, true);
+                messageStr = await getCurModelAudio(key, savePath)
+              } else {
+                messageStr = '创建audio文件失败'
+              }
             } catch (error) {
               messageStr = error.toString()
               console.error(error)
