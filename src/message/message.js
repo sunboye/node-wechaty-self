@@ -3,7 +3,7 @@
  * @Position: 
  * @Date: 2023-04-15 10:50:49
  * @LastEditors: yangss
- * @LastEditTime: 2023-04-20 21:19:16
+ * @LastEditTime: 2023-05-30 22:11:11
  * @FilePath: \node-wechaty-self\src\message\message.js
  */
 import { FileBox } from 'file-box'
@@ -99,7 +99,7 @@ const createTranscription = async (file) => {
     const text = res.text  || ''
     return text
   } else {
-    return `Error: ${res.message}`
+    return `Error: ${res.message ? res.message : res.code}`
   }
 }
 const createAudioChat = async (key, file) => {
@@ -108,20 +108,20 @@ const createAudioChat = async (key, file) => {
     const text = res.text  || ''
     return await chatCompletions(key, text)
   } else {
-    return `Error: ${res.message}`
+    return `Error: ${res.message ? res.message : res.code}`
   }
 }
 const chatCompletions = async (key, text) => {
   // 3.5模型
   const params = {
-    max_tokens: 800,
+    max_tokens: 1000,
     context: key
   }
   const res = await openai.createChatCompletions(text, params)
   if (res.success) {
     return res.choices && res.choices.length && res.choices[0].message ? res.choices[0].message.content : ''
   } else {
-    return `Error: ${res.message}`
+    return `Error: ${res.message ? res.message : res.code}`
   }
 }
 
@@ -133,14 +133,14 @@ const nomalCompletions = async (text) => {
   if (res.success) {
     return res.choices && res.choices.length && res.choices[0] ? res.choices[0].text :''
   } else {
-    return  `Error: ${res.message}`
+    return  `Error: ${res.message ? res.message : res.code}`
   }
 }
 
 const generateImage = async (text) => {
   // 生成图片功能
   const res = await openai.generateImage(text)
-  const fileBox = res.success && res.data && res.data[0].url ? FileBox.fromUrl(res.data[0].url) : res.message
+  const fileBox = res.success && res.data && res.data[0].url ? FileBox.fromUrl(res.data[0].url) : res.message ? res.message : res.code
   return fileBox
 }
 
@@ -237,7 +237,7 @@ const onMessage = async (msg) => {
       try {
         await msg.say(messageStr)
       } catch (error) {
-        await msg.say(`Error: ${error.message}`)
+        await msg.say(`Error: ${error.message ? error.message : error.code || ''}`)
       }
     }
   }
